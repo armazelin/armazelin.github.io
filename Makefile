@@ -4,7 +4,7 @@
 # "make test" to test website using lighthouse and open results in browser
 branch = "master"
 site = "https://armazelin.github.io/"
-reason = "Unknown reason."
+reason = 'Unknown reason.'
 
 help :
 	@ echo "Github Pages pusher, quickly slapped together by ARMazelin. No copyrights or warranties whatsoever."
