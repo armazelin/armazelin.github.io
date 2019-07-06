@@ -23,9 +23,13 @@
       <ul id="nav-mobile" class="sidenav">
         <li><div class="user-view">
             <div class="background">
-                <img alt="background" src="img/background.webp">
+                <picture>
+                    <source srcset="img/background.webp" type="image/webp">
+                    <source srcset="img/background.jpg" type="image/jpeg"> 
+                    <img src="img/background.jpg" alt="Background">
+                </picture>
             </div>
-            <a href="#user"><img class="circle" alt="profile" src="img/profile.webp"></a>
+            <a href="#user"><img class="circle" alt="profile" src="img/profile.jpeg"></a>
             <a href="#name"><span class="white-text name">Anthony Mazelin</span></a>
             <a href="#email"><span class="white-text email">armazelin@gmail.com</span></a>
         </div></li>
