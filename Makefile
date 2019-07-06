@@ -12,8 +12,8 @@ help :
 
 push :
 	git add --all
-	git commit -m "$reason"
-	git push -u origin "$branch"
+	git commit -m "$(reason)"
+	git push -u origin $(branch)
 
 test :
-	lighthouse "$site" --view
+	lighthouse $(site) --view
