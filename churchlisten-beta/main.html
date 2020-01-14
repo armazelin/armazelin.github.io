@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="metro-all.min.css">
+    <script src="engine.js"></script>
+    <script src="native.js"></script>
+  </head>
+  <body style="background-image: url('church.jpg'); background-size: cover;">
+    <div data-role="appbar">
+    <a href="#" class="brand">        </a>
+    <div class="app-bar-container">
+        <a href="#" class="app-bar-item dropdown-toggle" id="selectedchurch">Church</a>
+        <ul class="d-menu" data-role="dropdown" id="hello" style="overflow: scroll;">
+            <li>
+                <a href="#" class="dropdown-toggle">Tennessee</a>
+                <ul class="d-menu" data-role="dropdown">
+                    <li><a href="#">Monterey</a></li>
+                </ul>
+            </li>
+            <li>
+            <a href="#" class="dropdown-toggle">Kansas</a>
+                <ul class="d-menu" data-role="dropdown">
+                    <li><a href="#" onclick="window.alert('hello');">Heston</a></li>
+                    <li><a href="#">Bethel Home</a></li>
+                </ul>
+            </li>
+         </ul>
+    </div></div>
+    <audio id="testaudio" src="http://www.google.com/"></audio>
+    <div class="bottom-nav pos-absolute" style="background-color: lightgray;">
+    <a id="status">Not connected.</a>
+    <script src="main.js"></script>
+    <script src="metro.min.js"></script>
+  </body>
+</html>
