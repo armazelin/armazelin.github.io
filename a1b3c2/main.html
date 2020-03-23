@@ -54,9 +54,13 @@
                     <div class="left"><ons-back-button><div id="backcongregations">Church</div></ons-back-button></div>
                     <div class="center"></div>
                 </ons-toolbar>
-
-                
-                <ons-bottom-toolbar><div style="text-align: center; fontsize: 14px;" id="status">Stream status is unknown.</div></ons-bottom-toolbar>
+                <div class="card">
+                    <div class="card__content"><div id="status"></div><br>For other listening options please select below.</div>
+                </div>
+                <ons-list>
+                    <ons-list-item>Listen by phone.</ons-list-item>
+                    <ons-list-item onclick="window.open('http://' + window.api.techname + '.listentochurch.com');">Listen by official website.</ons-list-item>
+                </ons-list>
             </ons-page>
         </template>
 </body>
