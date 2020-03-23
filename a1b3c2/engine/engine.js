@@ -39,5 +39,6 @@ churchListen.prototype.getStreamingUrl = function() {
     if (this.technumber < 1) {
         throw "No place loaded";
     };
-    return "http://icecast.aleph-com.net:8000/" + this.technumber.toString() + ".mp3";
+    return "https://cors-anywhere.herokuapp.com/http://icecast.aleph-com.net:8000/" + this.technumber.toString() + ".mp3";
+    //return "http://icecast.aleph-com.net:8000/" + this.technumber.toString() + ".mp3";
 }
