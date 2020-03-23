@@ -7,14 +7,14 @@ self.addEventListener('install', function(e) {
     e.waitUntil(
         caches.open(cacheName).then(function(cache) {
             return cache.addAll([
-                './a1b3c2/',
-                './a1b3c2/main.html',
-                './a1b3c2/main.js',
-                './a1b3c2/onsenui/css/onsenui.css',
-                './a1b3c2/onsenui/css/onsen-css-components.min.css',
-                './a1b3c2/onsenui/js/onsenui.min.js',
-                './a1b3c2/engine/engine.js',
-                './a1b3c2/engine/native.js'
+                './',
+                './main.html',
+                './main.js',
+                './onsenui/css/onsenui.css',
+                './onsenui/css/onsen-css-components.min.css',
+                './onsenui/js/onsenui.min.js',
+                './engine/engine.js',
+                './engine/native.js'
             ]).then(function() {
                 self.skipWaiting();
             });
