@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="manifest" href="./a1b3c2/manifest.json">
+        <meta name="theme-color" content="#ffffff">
+        <title>ChurchListen</title>
+        <link rel="stylesheet" href="a1b3c2/onsenui/css/onsenui.css">
+        <link rel="stylesheet" href="a1b3c2/onsenui/css/onsen-css-components.min.css">
+        <script src="a1b3c2/onsenui/js/onsenui.min.js"></script>
+        <script src="a1b3c2/engine/engine.js"></script>
+        <script src="a1b3c2/engine/native.js"></script>
+        <script src="a1b3c2/main.js"></script>
+    </head>
+<body>
+    <audio id="testaudio" src="about:blank" style="visibility: hidden;"></audio>
+    <ons-navigator swipeable id="myNavigator" page="page1.html"></ons-navigator>
+        <template id="page1.html">
+            <ons-page id="page1">
+                <ons-toolbar>
+                    <div class="center">State/Province</div>
+                </ons-toolbar>
+                <ons-list id="states">
+                    <ons-list-item onclick="loadState('Tennessee');">Tennessee</ons-list-item>
+                    <ons-list-item onclick="loadState('Kentucky');">Kentucky</ons-list-item>
+                </ons-list>
+            </ons-page>
+        </template>
+
+        <template id="page2.html">
+            <ons-page id="page2">
+                <ons-toolbar>
+                    <div class="left"><ons-back-button>States</ons-back-button></div>
+                    <div class="center"></div>
+                </ons-toolbar>
+
+                <ons-list id="places"></ons-list>
+            </ons-page>
+        </template>
+        <template id="page3.html">
+            <ons-page id="page3">
+                <ons-toolbar>
+                    <div class="left"><ons-back-button><div id="backcongregations">Church</div></ons-back-button></div>
+                    <div class="center"></div>
+                </ons-toolbar>
+
+                
+                <ons-bottom-toolbar><div style="text-align: center; fontsize: 14px;" id="status">Stream status is unknown.</div></ons-bottom-toolbar>
+            </ons-page>
+        </template>
+</body>
+</html>
