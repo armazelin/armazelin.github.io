@@ -53,7 +53,7 @@ document.addEventListener('init', function(event) {
 });
 
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./a1b3c2/sw.js', { scope: 'a1b3c2/' }).then(function(reg) {
+    navigator.serviceWorker.register('./a1b3c2/sw.js', { scope: '/a1b3c2/' }).then(function(reg) {
         console.log('Successfully registered service worker.', reg);
     }).catch(function(err) {
         console.warn('Error whilst registering service worker', err);
