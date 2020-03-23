@@ -32,12 +32,12 @@ churchListen.prototype.getStatus = function(callback) {
     if (this.technumber < 1) {
         return false;
     };
-    requestJSON("https://listentochurch.com/api/v1/public/stream/status/" + this.technumber, callback);
+    requestJSON("http://listentochurch.com/api/v1/public/stream/status/" + this.technumber, callback);
     return true
 }
 churchListen.prototype.getStreamingUrl = function() {
     if (this.technumber < 1) {
         throw "No place loaded";
     };
-    return "http://icecast.aleph-com.net:8000/" + this.technumber.toString() + ".mp3";
+    return "https://icecast.aleph-com.net:8000/" + this.technumber.toString() + ".mp3";
 }
