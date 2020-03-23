@@ -18,6 +18,8 @@ document.addEventListener('init', function(event) {
 
     if (window.api === undefined) {
         window.api = new churchPlayback(document.getElementById("testaudio"));
+        // BETA Warning
+        ons.notification.alert('This program is in pre-ALPHA state. if you stub your toe blame yourself.');
     }
 
     if (page.id === 'page1') {
