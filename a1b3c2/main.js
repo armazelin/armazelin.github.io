@@ -13,6 +13,14 @@ function handle_status (result) {
     document.getElementById("status").innerText = result["message"] + ".";
 };
 
+function makePhoneCall() {
+    number = window.api.getPhoneNumber();
+    if (number == undefined) {
+        ons.notification.alert('Cannot find phone number.');
+    } else {
+        window.location.href = 'tel:' + number;
+    };
+};
 document.addEventListener('init', function(event) {
     var page = event.target;
 
