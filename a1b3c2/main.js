@@ -26,8 +26,7 @@ document.addEventListener('init', function(event) {
 
     if (window.api === undefined) {
         window.api = new churchPlayback(document.getElementById("testaudio"));
-        // BETA Warning
-        ons.notification.alert('This program is in pre-ALPHA state. if you stub your toe blame yourself.');
+        window.nosleep = new NoSleep();
     }
 
     if (page.id === 'page1') {
@@ -49,12 +48,14 @@ document.addEventListener('init', function(event) {
             window.api.getStatus(handle_status);
             return true;
         },2000);
+        window.nosleep.enable();
         page.querySelector('ons-toolbar .center').innerHTML = page.data.title;
         page.querySelector('#backcongregations').innerHTML = window.state;
         page.querySelector('ons-back-button').onClick = function(event) {
             console.log("Cancelling music.");
             window.api.unloadCongregation();
             window.clearInterval(window.status_indicator);
+            window.nosleep.disable();
             document.querySelector('ons-navigator').popPage()
         };
         window.api.getStatus(handle_status);

@@ -11,7 +11,7 @@ function requestJSON(url, callback) {
         document.getElementById('scriptid').remove();
     };
     element = document.createElement("script");
-    element.src = "https://json2jsonp.com/?url=" + url + "&callback=window._callback";
+    element.src = "https://json2jsonp.com/?url=" + url + "&callback=window._callback&a=" + Math.random().toString();
     element.type = "text/javascript";
     element.id = "scriptid";
     document.getElementsByTagName("head")[0].appendChild(element);
