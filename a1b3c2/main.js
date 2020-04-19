@@ -47,7 +47,7 @@ document.addEventListener('init', function(event) {
         window.status_indicator = window.setInterval(function () {
             window.api.getStatus(handle_status);
             return true;
-        },2000);
+        },10000);
         window.nosleep.enable();
         page.querySelector('ons-toolbar .center').innerHTML = page.data.title;
         page.querySelector('#backcongregations').innerHTML = window.state;
