@@ -1,0 +1,73 @@
+<html>
+<head>
+<style type="text/css">
+@keyframes zoom {
+	0% {
+  		transform: scale(0.1);
+	}
+	80% {
+		transform: scale(1.3);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+body {
+	background-color: black;
+	color: white;
+}
+.messagebox {
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+.status {
+	animation: 2s ease-out 0s 1 zoom;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+.message {
+	font-size: 5em;
+} 
+</style>
+<script src="https://assets.what3words.com/sdk/v3/what3words.js?key=E8UG6DTU"></script>
+<script type="text/javascript">
+	var options = {
+  		enableHighAccuracy: true,
+  		timeout: 5000,
+  		maximumAge: 0
+	};
+	function cancel (error=1) {
+		document.getElementsByClassName("status")[0].src = "canceled.png";
+		document.getElementsByClassName("message")[0].innerHTML = "Canceled.";
+	};
+	function locationtowords (crd) {
+		console.log('Your current position is:');
+  		console.log(`Latitude : ${crd.latitude}`);
+  		console.log(`Longitude: ${crd.longitude}`);
+  		console.log(`More or less ${crd.accuracy} meters.`);
+		what3words.api.convertTo3wa({lat:crd.latitude, lng:crd.longitude}, 'en')
+  			.then(function(response) {
+				document.getElementsByClassName("status")[0].src = "success.png";
+				document.getElementsByClassName("message")[0].innerHTML = "Canceled.";
+    				console.log("[convertTo3wa]", response);
+  		});
+	};
+	window.onload = function () {
+		if (confirm("Are you currently at the job site?")) {
+			document.getElementsByClassName("message")[0].innerHTML = "Requesting location..."
+			navigator.geolocation.getCurrentPosition(locationtowords, cancel);
+		} else {
+			cancel();
+		}
+	};
+</script>
+</head>
+<body>
+<div class="messagebox">
+<img class="status" src="loading.gif"><br/>
+<div class="message">Loading</div>
+</div></body></html>
