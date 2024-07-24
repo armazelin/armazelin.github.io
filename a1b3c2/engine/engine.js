@@ -33,7 +33,7 @@ churchListen.prototype.getStatus = function(callback) {
     if (this.technumber < 1) {
         return false;
     };
-    requestJSON("https://api.listentochurch.com/api/v1/public/streamserver/" + this.technumber, callback);
+    requestJSON("https://api.listentochurch.com/api/v1/public/stream/status/" + this.technumber, callback);
     return true
 }
 churchListen.prototype.getStreamingUrl = function() {
