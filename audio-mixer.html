@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Mixer</title>
+<style>
+  :root{
+    --bg-top:#1c1d22;
+    --bg-bot:#0a0a0c;
+    --panel:#202126;
+    --panel-edge:#2c2d33;
+    --strip-bg:#17181c;
+    --track:#0d0e10;
+    --accent:#ff8a3d;
+    --accent-dim:#5a3d24;
+    --led-green:#3ddc74;
+    --led-red:#ff4d4d;
+    --text-hi:#f2f2f4;
+    --text-lo:#8b8c93;
+    --divider:#2a2b31;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-user-select:none; user-select:none; -webkit-tap-highlight-color:transparent;}
+  html,body{
+    margin:0; padding:0; height:100%; width:100%;
+    background:radial-gradient(ellipse at 50% -10%, var(--bg-top), var(--bg-bot) 70%);
+    font-family:var(--font);
+    overscroll-behavior:none;
+    touch-action:none;
+  }
+  #app{
+    height:100dvh; width:100vw;
+    display:flex; flex-direction:column;
+    padding: max(14px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    color:var(--text-hi);
+  }
+
+  /* Header */
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:2px 8px 14px 8px;
+  }
+  .title-block{display:flex; flex-direction:column; gap:2px;}
+  .title{font-size:17px; font-weight:700; letter-spacing:0.2px;}
+  .subtitle{font-size:11px; color:var(--text-lo); font-weight:500;}
+  .status{
+    display:flex; align-items:center; gap:6px;
+    background:var(--panel);
+    border:1px solid var(--panel-edge);
+    padding:6px 10px 6px 8px;
+    border-radius:20px;
+  }
+  .dot{width:8px; height:8px; border-radius:50%; background:var(--led-red); box-shadow:0 0 6px var(--led-red);}
+  .dot.live{background:var(--led-green); box-shadow:0 0 8px var(--led-green);}
+  .status-text{font-size:12px; font-weight:600; color:var(--text-lo);}
+
+  /* Power button row */
+  .power-row{
+    display:flex; gap:8px; padding:0 8px 12px 8px;
+  }
+  .btn{
+    flex:1;
+    border:none;
+    border-radius:14px;
+    padding:12px 10px;
+    font-family:var(--font);
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:0.2px;
+    background:var(--panel);
+    color:var(--text-hi);
+    border:1px solid var(--panel-edge);
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .btn:active{ filter:brightness(0.85); }
+  .btn.primary{
+    background:linear-gradient(180deg, #ffa15c, var(--accent));
+    color:#241205;
+    border:1px solid #ffb377;
+  }
+  .btn.danger{
+    background:linear-gradient(180deg, #ff6b6b, #d33d3d);
+    color:#2b0505;
+    border:1px solid #ff8a8a;
+  }
+  .btn[disabled]{ opacity:0.4; }
+
+  /* Mixer surface */
+  .surface{
+    flex:1;
+    background:var(--panel);
+    border:1px solid var(--panel-edge);
+    border-radius:20px;
+    display:flex;
+    padding:14px 6px 10px 6px;
+    gap:2px;
+    min-height:0;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 8px 24px rgba(0,0,0,0.35);
+  }
+
+  .strip{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-width:0;
+    position:relative;
+  }
+  .strip + .strip{ border-left:1px solid var(--divider); }
+
+  .strip-label{
+    font-size:11px;
+    font-weight:700;
+    color:var(--text-lo);
+    letter-spacing:0.6px;
+    margin-bottom:4px;
+    text-transform:uppercase;
+  }
+  .strip.master .strip-label{ color:var(--accent); }
+
+  .value-readout{
+    font-size:10px;
+    font-weight:600;
+    color:var(--text-lo);
+    margin-bottom:8px;
+    font-variant-numeric: tabular-nums;
+    min-width:32px;
+    text-align:center;
+  }
+
+  .fader-wrap{
+    flex:1;
+    width:100%;
+    display:flex;
+    justify-content:center;
+    min-height:0;
+    position:relative;
+    padding:4px 0;
+  }
+
+  .fader-track{
+    width:6px;
+    height:100%;
+    background:var(--track);
+    border-radius:4px;
+    position:relative;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.6);
+  }
+  .fader-fill{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    background:linear-gradient(180deg, var(--accent), var(--accent-dim));
+    border-radius:4px;
+  }
+  .strip.master .fader-fill{
+    background:linear-gradient(180deg, #ffb877, #7a4318);
+  }
+
+  .fader-ticks{
+    position:absolute;
+    left:-3px; right:-3px; top:0; bottom:0;
+    pointer-events:none;
+  }
+  .tick{
+    position:absolute; left:50%; transform:translateX(-50%);
+    width:14px; height:1px; background:rgba(255,255,255,0.08);
+  }
+  .tick.mid{ width:18px; background:rgba(255,255,255,0.18); }
+
+  .fader-handle{
+    position:absolute;
+    left:50%;
+    width:34px; height:20px;
+    transform:translate(-50%, 50%);
+    background:linear-gradient(180deg, #4a4b52, #202126);
+    border:1px solid #57585f;
+    border-radius:6px;
+    box-shadow:0 3px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+  .fader-handle::before{
+    content:"";
+    position:absolute;
+    left:6px; right:6px; top:50%;
+    height:2px;
+    transform:translateY(-50%);
+    background:var(--accent);
+    border-radius:2px;
+  }
+  .strip.master .fader-handle::before{ background:#ffb877; }
+
+  .hit-area{
+    position:absolute;
+    left:50%; top:0; bottom:0;
+    width:56px;
+    transform:translateX(-50%);
+    cursor:pointer;
+  }
+
+  /* Meter (mic level) */
+  .meter{
+    width:10px;
+    height:56px;
+    margin-top:10px;
+    border-radius:3px;
+    background:var(--track);
+    display:flex;
+    flex-direction:column-reverse;
+    overflow:hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.6);
+  }
+  .meter-fill{
+    width:100%;
+    height:0%;
+    background:linear-gradient(0deg, var(--led-green), #ffd23d 70%, var(--led-red) 92%);
+    transition:height 60ms linear;
+  }
+
+  footer{
+    padding:10px 8px 0 8px;
+    font-size:10.5px;
+    color:var(--text-lo);
+    text-align:center;
+    line-height:1.5;
+  }
+  footer b{ color:var(--text-hi); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="title-block">
+      <div class="title">AUX Mixer</div>
+      <div class="subtitle">Mic → EasyStream</div>
+    </div>
+    <div class="status">
+      <div class="dot" id="statusDot"></div>
+      <div class="status-text" id="statusText">Idle</div>
+    </div>
+  </header>
+
+  <div class="power-row">
+    <button class="btn primary" id="startBtn">Start Input</button>
+    <button class="btn danger" id="stopBtn" disabled>Stop</button>
+  </div>
+
+  <div class="surface">
+
+    <div class="strip" data-band="low">
+      <div class="strip-label">Low</div>
+      <div class="value-readout" id="readout-low">0 dB</div>
+      <div class="fader-wrap">
+        <div class="fader-track">
+          <div class="fader-ticks">
+            <div class="tick mid" style="top:50%"></div>
+            <div class="tick" style="top:25%"></div>
+            <div class="tick" style="top:75%"></div>
+          </div>
+          <div class="fader-fill" id="fill-low"></div>
+          <div class="fader-handle" id="handle-low"></div>
+        </div>
+        <div class="hit-area" id="hit-low"></div>
+      </div>
+    </div>
+
+    <div class="strip" data-band="mid">
+      <div class="strip-label">Mid</div>
+      <div class="value-readout" id="readout-mid">0 dB</div>
+      <div class="fader-wrap">
+        <div class="fader-track">
+          <div class="fader-ticks">
+            <div class="tick mid" style="top:50%"></div>
+            <div class="tick" style="top:25%"></div>
+            <div class="tick" style="top:75%"></div>
+          </div>
+          <div class="fader-fill" id="fill-mid"></div>
+          <div class="fader-handle" id="handle-mid"></div>
+        </div>
+        <div class="hit-area" id="hit-mid"></div>
+      </div>
+    </div>
+
+    <div class="strip" data-band="high">
+      <div class="strip-label">High</div>
+      <div class="value-readout" id="readout-high">0 dB</div>
+      <div class="fader-wrap">
+        <div class="fader-track">
+          <div class="fader-ticks">
+            <div class="tick mid" style="top:50%"></div>
+            <div class="tick" style="top:25%"></div>
+            <div class="tick" style="top:75%"></div>
+          </div>
+          <div class="fader-fill" id="fill-high"></div>
+          <div class="fader-handle" id="handle-high"></div>
+        </div>
+        <div class="hit-area" id="hit-high"></div>
+      </div>
+    </div>
+
+    <div class="strip master" data-band="master">
+      <div class="strip-label">Master</div>
+      <div class="value-readout" id="readout-master">100%</div>
+      <div class="fader-wrap">
+        <div class="fader-track">
+          <div class="fader-ticks">
+            <div class="tick mid" style="top:50%"></div>
+            <div class="tick" style="top:10%"></div>
+          </div>
+          <div class="fader-fill" id="fill-master"></div>
+          <div class="fader-handle" id="handle-master"></div>
+        </div>
+        <div class="hit-area" id="hit-master"></div>
+      </div>
+      <div class="meter"><div class="meter-fill" id="meterFill"></div></div>
+    </div>
+
+  </div>
+
+  <footer>Raw mic passthrough &mdash; echo cancel / noise suppression / AGC <b>disabled</b>. Route this device's audio output to EasyStream via aux cable.</footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- State ----------
+  // EQ bands stored in dB [-24, +24], master stored 0..1.5 (0..150%)
+  const state = {
+    low:   { value: 0, min: -24, max: 24, unit: "dB" },
+    mid:   { value: 0, min: -24, max: 24, unit: "dB" },
+    high:  { value: 0, min: -24, max: 24, unit: "dB" },
+    master:{ value: 1, min: 0, max: 1.5, unit: "%" }
+  };
+
+  let audioCtx = null;
+  let sourceNode = null;
+  let lowFilter, midFilter, highFilter, masterGain, analyser;
+  let mediaStream = null;
+  let rafId = null;
+
+  const els = {};
+  ["low","mid","high","master"].forEach(band=>{
+    els[band] = {
+      fill: document.getElementById("fill-"+band),
+      handle: document.getElementById("handle-"+band),
+      hit: document.getElementById("hit-"+band),
+      readout: document.getElementById("readout-"+band)
+    };
+  });
+
+  const startBtn = document.getElementById("startBtn");
+  const stopBtn = document.getElementById("stopBtn");
+  const statusDot = document.getElementById("statusDot");
+  const statusText = document.getElementById("statusText");
+  const meterFill = document.getElementById("meterFill");
+
+  // ---------- Fader UI logic ----------
+  // Maps a 0..1 fraction (0 = bottom, 1 = top) to a value in [min,max]
+  function fracToValue(band, frac){
+    const s = state[band];
+    return s.min + frac * (s.max - s.min);
+  }
+  function valueToFrac(band, value){
+    const s = state[band];
+    return (value - s.min) / (s.max - s.min);
+  }
+
+  function renderFader(band){
+    const s = state[band];
+    const frac = Math.min(1, Math.max(0, valueToFrac(band, s.value)));
+    const pct = (frac*100).toFixed(2)+"%";
+    els[band].fill.style.height = pct;
+    els[band].handle.style.bottom = pct;
+
+    if(band === "master"){
+      els[band].readout.textContent = Math.round(s.value*100) + "%";
+    } else {
+      const rounded = Math.round(s.value);
+      els[band].readout.textContent = (rounded>0?"+":"") + rounded + " dB";
+    }
+  }
+
+  function applyToAudioGraph(band){
+    if(!audioCtx) return;
+    const s = state[band];
+    const now = audioCtx.currentTime;
+    if(band === "low" && lowFilter) lowFilter.gain.setTargetAtTime(s.value, now, 0.01);
+    if(band === "mid" && midFilter) midFilter.gain.setTargetAtTime(s.value, now, 0.01);
+    if(band === "high" && highFilter) highFilter.gain.setTargetAtTime(s.value, now, 0.01);
+    if(band === "master" && masterGain) masterGain.gain.setTargetAtTime(s.value, now, 0.01);
+  }
+
+  function setBandFromFrac(band, frac){
+    frac = Math.min(1, Math.max(0, frac));
+    state[band].value = fracToValue(band, frac);
+    renderFader(band);
+    applyToAudioGraph(band);
+  }
+
+  // Default fader starting positions (visual + logical)
+  state.low.value = 0;
+  state.mid.value = 0;
+  state.high.value = 0;
+  state.master.value = 1;
+  ["low","mid","high","master"].forEach(renderFader);
+
+  // ---------- Drag handling (touch + mouse) ----------
+  function attachDrag(band){
+    const hit = els[band].hit;
+
+    function pointerToFrac(clientY){
+      const rect = hit.getBoundingClientRect();
+      const relY = clientY - rect.top;
+      const frac = 1 - (relY / rect.height);
+      return frac;
+    }
+
+    function onMove(clientY){
+      setBandFromFrac(band, pointerToFrac(clientY));
+    }
+
+    hit.addEventListener("touchstart", function(e){
+      e.preventDefault();
+      onMove(e.touches[0].clientY);
+    }, {passive:false});
+
+    hit.addEventListener("touchmove", function(e){
+      e.preventDefault();
+      onMove(e.touches[0].clientY);
+    }, {passive:false});
+
+    hit.addEventListener("mousedown", function(e){
+      e.preventDefault();
+      onMove(e.clientY);
+      function mm(ev){ onMove(ev.clientY); }
+      function mu(){
+        window.removeEventListener("mousemove", mm);
+        window.removeEventListener("mouseup", mu);
+      }
+      window.addEventListener("mousemove", mm);
+      window.addEventListener("mouseup", mu);
+    });
+  }
+  ["low","mid","high","master"].forEach(attachDrag);
+
+  // ---------- Audio engine ----------
+  async function startAudio(){
+    try{
+      statusText.textContent = "Requesting mic…";
+
+      const constraints = {
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+          channelCount: 2,
+          sampleRate: 48000
+        },
+        video: false
+      };
+
+      mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: "interactive" });
+      if(audioCtx.state === "suspended"){ await audioCtx.resume(); }
+
+      sourceNode = audioCtx.createMediaStreamSource(mediaStream);
+
+      // 3-band EQ: low shelf, mid peaking, high shelf
+      lowFilter = audioCtx.createBiquadFilter();
+      lowFilter.type = "lowshelf";
+      lowFilter.frequency.value = 300;
+      lowFilter.gain.value = state.low.value;
+
+      midFilter = audioCtx.createBiquadFilter();
+      midFilter.type = "peaking";
+      midFilter.frequency.value = 1000;
+      midFilter.Q.value = 0.9;
+      midFilter.gain.value = state.mid.value;
+
+      highFilter = audioCtx.createBiquadFilter();
+      highFilter.type = "highshelf";
+      highFilter.frequency.value = 3000;
+      highFilter.gain.value = state.high.value;
+
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = state.master.value;
+
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 512;
+      analyser.smoothingTimeConstant = 0.6;
+
+      sourceNode.connect(lowFilter);
+      lowFilter.connect(midFilter);
+      midFilter.connect(highFilter);
+      highFilter.connect(masterGain);
+      masterGain.connect(analyser);
+      analyser.connect(audioCtx.destination);
+
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      statusDot.classList.add("live");
+      statusText.textContent = "Live";
+
+      startMeter();
+
+    }catch(err){
+      console.error(err);
+      statusText.textContent = "Mic blocked";
+      statusDot.classList.remove("live");
+      alert("Could not access microphone: " + (err && err.message ? err.message : err));
+    }
+  }
+
+  function stopAudio(){
+    if(rafId) cancelAnimationFrame(rafId);
+    rafId = null;
+
+    if(mediaStream){
+      mediaStream.getTracks().forEach(t=>t.stop());
+      mediaStream = null;
+    }
+    if(audioCtx){
+      audioCtx.close();
+      audioCtx = null;
+    }
+    sourceNode = null; lowFilter = null; midFilter = null; highFilter = null; masterGain = null; analyser = null;
+
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+    statusDot.classList.remove("live");
+    statusText.textContent = "Idle";
+    meterFill.style.height = "0%";
+  }
+
+  function startMeter(){
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    function tick(){
+      analyser.getByteTimeDomainData(data);
+      let peak = 0;
+      for(let i=0;i<data.length;i++){
+        const v = Math.abs(data[i]-128)/128;
+        if(v>peak) peak = v;
+      }
+      const pct = Math.min(100, Math.pow(peak,0.6)*100);
+      meterFill.style.height = pct.toFixed(1)+"%";
+      rafId = requestAnimationFrame(tick);
+    }
+    tick();
+  }
+
+  startBtn.addEventListener("click", startAudio);
+  stopBtn.addEventListener("click", stopAudio);
+
+  // Keep audio context alive / resume on visibility change (kiosk browsers can suspend)
+  document.addEventListener("visibilitychange", function(){
+    if(!document.hidden && audioCtx && audioCtx.state === "suspended"){
+      audioCtx.resume();
+    }
+  });
+
+  // Prevent pinch-zoom / double-tap zoom in kiosk contexts
+  document.addEventListener("gesturestart", e=>e.preventDefault());
+  let lastTouchEnd = 0;
+  document.addEventListener("touchend", function(e){
+    const now = Date.now();
+    if(now - lastTouchEnd <= 300){ e.preventDefault(); }
+    lastTouchEnd = now;
+  }, false);
+
+})();
+</script>
+</body>
+</html>
